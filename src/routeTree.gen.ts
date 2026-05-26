@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VendasRouteImport } from './routes/vendas'
 import { Route as PerfumesRouteImport } from './routes/perfumes'
 import { Route as ClientesRouteImport } from './routes/clientes'
+import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VendasNovaRouteImport } from './routes/vendas.nova'
 
@@ -30,6 +31,11 @@ const ClientesRoute = ClientesRouteImport.update({
   path: '/clientes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CatalogoRoute = CatalogoRouteImport.update({
+  id: '/catalogo',
+  path: '/catalogo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -43,6 +49,7 @@ const VendasNovaRoute = VendasNovaRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/catalogo': typeof CatalogoRoute
   '/clientes': typeof ClientesRoute
   '/perfumes': typeof PerfumesRoute
   '/vendas': typeof VendasRouteWithChildren
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/catalogo': typeof CatalogoRoute
   '/clientes': typeof ClientesRoute
   '/perfumes': typeof PerfumesRoute
   '/vendas': typeof VendasRouteWithChildren
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/catalogo': typeof CatalogoRoute
   '/clientes': typeof ClientesRoute
   '/perfumes': typeof PerfumesRoute
   '/vendas': typeof VendasRouteWithChildren
@@ -65,14 +74,28 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/clientes' | '/perfumes' | '/vendas' | '/vendas/nova'
+  fullPaths:
+    | '/'
+    | '/catalogo'
+    | '/clientes'
+    | '/perfumes'
+    | '/vendas'
+    | '/vendas/nova'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/clientes' | '/perfumes' | '/vendas' | '/vendas/nova'
-  id: '__root__' | '/' | '/clientes' | '/perfumes' | '/vendas' | '/vendas/nova'
+  to: '/' | '/catalogo' | '/clientes' | '/perfumes' | '/vendas' | '/vendas/nova'
+  id:
+    | '__root__'
+    | '/'
+    | '/catalogo'
+    | '/clientes'
+    | '/perfumes'
+    | '/vendas'
+    | '/vendas/nova'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CatalogoRoute: typeof CatalogoRoute
   ClientesRoute: typeof ClientesRoute
   PerfumesRoute: typeof PerfumesRoute
   VendasRoute: typeof VendasRouteWithChildren
@@ -99,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/clientes'
       fullPath: '/clientes'
       preLoaderRoute: typeof ClientesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catalogo': {
+      id: '/catalogo'
+      path: '/catalogo'
+      fullPath: '/catalogo'
+      preLoaderRoute: typeof CatalogoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -131,6 +161,7 @@ const VendasRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CatalogoRoute: CatalogoRoute,
   ClientesRoute: ClientesRoute,
   PerfumesRoute: PerfumesRoute,
   VendasRoute: VendasRouteWithChildren,
