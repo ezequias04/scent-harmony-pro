@@ -127,7 +127,7 @@ function NovaVenda() {
         await supabase.from("movimentacoes_estoque").insert({
           user_id: user!.id,
           perfume_id: p.id,
-          tipo: "venda",
+          tipo: "saida_venda",
           quantidade: it.quantidade,
           motivo: `Venda ${venda.id.slice(0, 8)}`,
         });
