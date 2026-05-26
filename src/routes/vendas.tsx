@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { fmtBRL, fmtDate } from "@/lib/format";
-import { Plus, ShoppingCart, Receipt } from "lucide-react";
+import { Plus, ShoppingCart, Receipt, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/vendas")({
@@ -14,12 +16,14 @@ export const Route = createFileRoute("/vendas")({
 
 function VendasPage() {
   const qc = useQueryClient();
+  const { user } = useAuth();
+
   const { data: vendas = [], isLoading } = useQuery({
     queryKey: ["vendas"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("vendas")
-        .select("id, data_venda, total, lucro_total, status_pagamento, forma_pagamento, clientes(nome), itens_venda(quantidade)")
+        .select("id, data_venda, total, lucro_total, status_pagamento, forma_pagamento, clientes(nome), itens_venda(quantidade, perfume_id)")
         .order("data_venda", { ascending: false })
         .limit(100);
       if (error) throw error;
@@ -33,6 +37,46 @@ function VendasPage() {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Pagamento confirmado"); qc.invalidateQueries({ queryKey: ["vendas"] }); },
+  });
+
+  const cancelMut = useMutation({
+    mutationFn: async (venda: any) => {
+      if (venda.status_pagamento === "cancelado") throw new Error("Venda já cancelada");
+      // Devolve estoque
+      for (const it of venda.itens_venda ?? []) {
+        const { data: p, error: ep } = await supabase
+          .from("perfumes")
+          .select("quantidade_estoque")
+          .eq("id", it.perfume_id)
+          .single();
+        if (ep) throw ep;
+        const novaQtd = (p?.quantidade_estoque ?? 0) + it.quantidade;
+        const { error: eu } = await supabase
+          .from("perfumes")
+          .update({ quantidade_estoque: novaQtd })
+          .eq("id", it.perfume_id);
+        if (eu) throw eu;
+        const { error: em } = await supabase.from("movimentacoes_estoque").insert({
+          user_id: user!.id,
+          perfume_id: it.perfume_id,
+          tipo: "devolucao_cancelamento",
+          quantidade: it.quantidade,
+          motivo: `Cancelamento venda ${venda.id.slice(0, 8)}`,
+        });
+        if (em) throw em;
+      }
+      const { error } = await supabase
+        .from("vendas")
+        .update({ status_pagamento: "cancelado" })
+        .eq("id", venda.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Venda cancelada e estoque devolvido");
+      qc.invalidateQueries({ queryKey: ["vendas"] });
+      qc.invalidateQueries({ queryKey: ["perfumes"] });
+    },
+    onError: (e: any) => toast.error(e.message),
   });
 
   return (
@@ -57,34 +101,60 @@ function VendasPage() {
         </CardContent></Card>
       ) : (
         <div className="space-y-2">
-          {vendas.map((v) => (
-            <Card key={v.id}>
-              <CardContent className="p-4 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-lg bg-secondary text-secondary-foreground flex items-center justify-center shrink-0">
-                    <Receipt className="w-5 h-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="font-medium truncate">{v.clientes?.nome ?? "Sem cliente"}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {fmtDate(v.data_venda)} • {v.itens_venda?.length ?? 0} itens • {v.forma_pagamento ?? "—"}
+          {vendas.map((v) => {
+            const cancelada = v.status_pagamento === "cancelado";
+            return (
+              <Card key={v.id} className={cancelada ? "opacity-60" : ""}>
+                <CardContent className="p-4 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-lg bg-secondary text-secondary-foreground flex items-center justify-center shrink-0">
+                      <Receipt className="w-5 h-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-medium truncate">{v.clientes?.nome ?? "Sem cliente"}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {fmtDate(v.data_venda)} • {v.itens_venda?.length ?? 0} itens • {v.forma_pagamento ?? "—"}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="text-right shrink-0">
-                  <div className="font-serif text-lg text-primary">{fmtBRL(v.total)}</div>
-                  <div className="text-xs text-muted-foreground">Lucro {fmtBRL(v.lucro_total)}</div>
-                  {v.status_pagamento === "pendente" ? (
-                    <Button size="sm" variant="outline" className="mt-1 h-7" onClick={() => pagarMut.mutate(v.id)}>
-                      Marcar pago
-                    </Button>
-                  ) : (
-                    <Badge variant={v.status_pagamento === "pago" ? "default" : "secondary"} className="mt-1">{v.status_pagamento}</Badge>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                  <div className="text-right shrink-0 flex flex-col items-end gap-1">
+                    <div className={`font-serif text-lg ${cancelada ? "line-through text-muted-foreground" : "text-primary"}`}>{fmtBRL(v.total)}</div>
+                    <div className="text-xs text-muted-foreground">Lucro {fmtBRL(v.lucro_total)}</div>
+                    <div className="flex gap-1">
+                      {v.status_pagamento === "pendente" && (
+                        <Button size="sm" variant="outline" className="h-7" onClick={() => pagarMut.mutate(v.id)}>
+                          Marcar pago
+                        </Button>
+                      )}
+                      {!cancelada && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button size="icon" variant="ghost" className="h-7 w-7">
+                              <XCircle className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Cancelar venda?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Os produtos serão devolvidos ao estoque automaticamente.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Voltar</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => cancelMut.mutate(v)}>Cancelar venda</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
+                      {cancelada && <Badge variant="secondary">cancelado</Badge>}
+                      {v.status_pagamento === "pago" && <Badge>pago</Badge>}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>

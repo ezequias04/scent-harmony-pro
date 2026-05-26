@@ -2,13 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth-context";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fmtBRL, onlyDigits } from "@/lib/format";
-import { BookOpen, MessageCircle, ImageIcon, Share2 } from "lucide-react";
+import { BookOpen, MessageCircle, ImageIcon, Share2, Copy, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/catalogo")({
@@ -16,10 +18,17 @@ export const Route = createFileRoute("/catalogo")({
 });
 
 const CATEGORIAS = ["masculino", "feminino", "unissex", "arabe", "importado", "contratipo", "outro"];
+const TIPOS_PRODUTO = ["Perfume", "Perfume spray", "Body splash", "Creme corporal", "Creme hidratante", "Loção", "Óleo corporal", "Kit presente", "Outro"];
 
 function CatalogoPage() {
+  const { user } = useAuth();
   const [filtroCat, setFiltroCat] = useState("all");
+  const [filtroTipo, setFiltroTipo] = useState("all");
+  const [filtroMarca, setFiltroMarca] = useState("all");
+  const [precoMin, setPrecoMin] = useState("");
+  const [precoMax, setPrecoMax] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
+  const [apenasPromo, setApenasPromo] = useState(false);
 
   const { data: perfumes = [] } = useQuery({
     queryKey: ["catalogo-perfumes"],
@@ -35,15 +44,40 @@ function CatalogoPage() {
     },
   });
 
+  const marcas = useMemo(() => {
+    const s = new Set<string>();
+    perfumes.forEach((p) => { if (p.marca) s.add(p.marca); });
+    return Array.from(s).sort();
+  }, [perfumes]);
+
   const filtered = useMemo(() => {
-    return perfumes.filter((p) => filtroCat === "all" || p.categoria === filtroCat);
-  }, [perfumes, filtroCat]);
+    const pmin = parseFloat(precoMin) || 0;
+    const pmax = parseFloat(precoMax) || Infinity;
+    return perfumes.filter((p) => {
+      if (filtroCat !== "all" && p.categoria !== filtroCat) return false;
+      if (filtroTipo !== "all" && p.tipo_produto !== filtroTipo) return false;
+      if (filtroMarca !== "all" && p.marca !== filtroMarca) return false;
+      if (apenasPromo && p.status !== "promocao") return false;
+      const preco = Number(p.preco_venda);
+      if (preco < pmin || preco > pmax) return false;
+      return true;
+    });
+  }, [perfumes, filtroCat, filtroTipo, filtroMarca, precoMin, precoMax, apenasPromo]);
+
+  const publicUrl = user ? `${window.location.origin}/c/${user.id}` : "";
+
+  const copyLink = async () => {
+    await navigator.clipboard.writeText(publicUrl);
+    toast.success("Link copiado!");
+  };
 
   const shareCatalog = async () => {
-    const lines = filtered.map((p) =>
-      `• ${p.nome}${p.marca ? ` (${p.marca})` : ""}${p.volume_ml ? ` ${p.volume_ml}ml` : ""} — ${fmtBRL(p.preco_venda)}`
-    );
-    const text = `✨ *Catálogo de Perfumes*\n\n${lines.join("\n")}\n\nFaça seu pedido! 💬`;
+    const lines = filtered.map((p) => {
+      const tamanho = p.tamanho_volume || (p.volume_ml ? `${p.volume_ml}ml` : "");
+      return `• ${p.nome}${p.marca ? ` (${p.marca})` : ""}${tamanho ? ` ${tamanho}` : ""} — ${fmtBRL(p.preco_venda)}`;
+    });
+    const linkLine = publicUrl ? `\n\n🔗 Catálogo completo: ${publicUrl}` : "";
+    const text = `✨ *Catálogo de Produtos*\n\n${lines.join("\n")}${linkLine}\n\nFaça seu pedido! 💬`;
     if (whatsapp) {
       window.open(`https://wa.me/55${onlyDigits(whatsapp)}?text=${encodeURIComponent(text)}`, "_blank");
     } else {
@@ -56,34 +90,82 @@ function CatalogoPage() {
     <div className="space-y-5">
       <div>
         <h1 className="text-3xl">Catálogo</h1>
-        <p className="text-muted-foreground text-sm">{filtered.length} perfumes disponíveis</p>
+        <p className="text-muted-foreground text-sm">{filtered.length} produtos disponíveis</p>
       </div>
 
+      {publicUrl && (
+        <Card className="bg-secondary/30">
+          <CardContent className="p-4 space-y-2">
+            <div className="text-sm font-medium">Link público do seu catálogo</div>
+            <div className="flex gap-2">
+              <Input readOnly value={publicUrl} className="font-mono text-xs" />
+              <Button variant="outline" size="icon" onClick={copyLink}><Copy className="w-4 h-4" /></Button>
+              <a href={publicUrl} target="_blank" rel="noreferrer">
+                <Button variant="outline" size="icon"><ExternalLink className="w-4 h-4" /></Button>
+              </a>
+            </div>
+            <p className="text-xs text-muted-foreground">Compartilhe esse link com seus clientes — eles veem fotos, preços e pedem pelo WhatsApp.</p>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
-        <CardContent className="p-4 flex flex-col sm:flex-row gap-2">
-          <Select value={filtroCat} onValueChange={setFiltroCat}>
-            <SelectTrigger className="sm:w-48"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas categorias</SelectItem>
-              {CATEGORIAS.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Input placeholder="Seu WhatsApp para receber pedidos" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} />
-          <Button onClick={shareCatalog}>
-            <Share2 className="w-4 h-4 mr-2" /> Compartilhar
-          </Button>
+        <CardContent className="p-4 space-y-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            <Select value={filtroTipo} onValueChange={setFiltroTipo}>
+              <SelectTrigger><SelectValue placeholder="Tipo" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os tipos</SelectItem>
+                {TIPOS_PRODUTO.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={filtroCat} onValueChange={setFiltroCat}>
+              <SelectTrigger><SelectValue placeholder="Categoria" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas categorias</SelectItem>
+                {CATEGORIAS.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={filtroMarca} onValueChange={setFiltroMarca}>
+              <SelectTrigger><SelectValue placeholder="Marca" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas marcas</SelectItem>
+                {marcas.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <div>
+              <Label className="text-xs">Preço mín</Label>
+              <Input type="number" placeholder="0" value={precoMin} onChange={(e) => setPrecoMin(e.target.value)} />
+            </div>
+            <div>
+              <Label className="text-xs">Preço máx</Label>
+              <Input type="number" placeholder="∞" value={precoMax} onChange={(e) => setPrecoMax(e.target.value)} />
+            </div>
+            <div className="flex items-end">
+              <Button variant={apenasPromo ? "default" : "outline"} className="w-full" onClick={() => setApenasPromo((v) => !v)}>
+                Promoções
+              </Button>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-border">
+            <Input placeholder="Seu WhatsApp (opcional)" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} />
+            <Button onClick={shareCatalog}>
+              <Share2 className="w-4 h-4 mr-2" /> Compartilhar lista
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
       {filtered.length === 0 ? (
         <Card><CardContent className="py-16 text-center">
           <BookOpen className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
-          <p className="text-muted-foreground">Nenhum perfume no catálogo.</p>
+          <p className="text-muted-foreground">Nenhum produto no catálogo.</p>
         </CardContent></Card>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
           {filtered.map((p) => {
-            const msg = `Olá, tenho interesse no perfume ${p.nome}${p.volume_ml ? ` de ${p.volume_ml}ml` : ""} no valor de ${fmtBRL(p.preco_venda)}.`;
+            const tamanho = p.tamanho_volume || (p.volume_ml ? `${p.volume_ml}ml` : "");
+            const msg = `Olá, tenho interesse no produto ${p.nome}, ${p.tipo_produto}${tamanho ? `, ${tamanho}` : ""}, no valor de ${fmtBRL(p.preco_venda)}.`;
             const waLink = whatsapp
               ? `https://wa.me/55${onlyDigits(whatsapp)}?text=${encodeURIComponent(msg)}`
               : null;
@@ -97,15 +179,16 @@ function CatalogoPage() {
                       <ImageIcon className="w-10 h-10" />
                     </div>
                   )}
+                  <Badge className="absolute top-2 left-2 bg-background/90 text-foreground border border-border">{p.tipo_produto}</Badge>
                   {p.status === "promocao" && (
-                    <Badge className="absolute top-2 left-2 bg-accent text-accent-foreground">Promoção</Badge>
+                    <Badge className="absolute top-2 right-2 bg-accent text-accent-foreground">Promoção</Badge>
                   )}
                 </div>
                 <CardContent className="p-3 space-y-2">
                   <div>
                     <div className="font-medium truncate">{p.nome}</div>
                     <div className="text-xs text-muted-foreground truncate">
-                      {p.marca}{p.volume_ml ? ` • ${p.volume_ml}ml` : ""}
+                      {p.marca}{tamanho ? ` • ${tamanho}` : ""}
                     </div>
                   </div>
                   <div className="font-serif text-xl text-primary">{fmtBRL(p.preco_venda)}</div>
