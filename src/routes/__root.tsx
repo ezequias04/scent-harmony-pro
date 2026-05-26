@@ -4,7 +4,6 @@ import {
   createRootRouteWithContext,
   HeadContent,
   Scripts,
-  useRouterState,
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
@@ -18,9 +17,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Gestor de Perfumes" },
+      { title: "Gestor" },
       { name: "description", content: "Controle de vendas, estoque, clientes e catálogo para revenda de perfumes." },
       { name: "theme-color", content: "#7a1f2b" },
+      { property: "og:title", content: "Gestor" },
+      { name: "twitter:title", content: "Gestor" },
+      { property: "og:description", content: "Controle de vendas, estoque, clientes e catálogo para revenda de perfumes." },
+      { name: "twitter:description", content: "Controle de vendas, estoque, clientes e catálogo para revenda de perfumes." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/adac6331-c3b4-43dd-b76b-df436444b1ad/id-preview-14bee7f8--a589e560-8195-4ec9-b96b-8afb0534eede.lovable.app-1779755187227.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/adac6331-c3b4-43dd-b76b-df436444b1ad/id-preview-14bee7f8--a589e560-8195-4ec9-b96b-8afb0534eede.lovable.app-1779755187227.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:type", content: "website" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -49,9 +56,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function Gate() {
   const { loading, session } = useAuth();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isPublic = pathname.startsWith("/c/");
-  if (isPublic) return <Outlet />;
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
