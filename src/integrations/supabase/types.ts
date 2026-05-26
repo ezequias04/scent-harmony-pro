@@ -193,6 +193,7 @@ export type Database = {
           created_at: string
           descricao: string | null
           estoque_minimo: number
+          familia_olfativa: string | null
           fornecedor: string | null
           id: string
           imagem_url: string | null
@@ -203,6 +204,8 @@ export type Database = {
           preco_venda: number
           quantidade_estoque: number
           status: string
+          tamanho_volume: string | null
+          tipo_produto: string
           updated_at: string
           user_id: string
           volume_ml: number | null
@@ -212,6 +215,7 @@ export type Database = {
           created_at?: string
           descricao?: string | null
           estoque_minimo?: number
+          familia_olfativa?: string | null
           fornecedor?: string | null
           id?: string
           imagem_url?: string | null
@@ -222,6 +226,8 @@ export type Database = {
           preco_venda?: number
           quantidade_estoque?: number
           status?: string
+          tamanho_volume?: string | null
+          tipo_produto?: string
           updated_at?: string
           user_id: string
           volume_ml?: number | null
@@ -231,6 +237,7 @@ export type Database = {
           created_at?: string
           descricao?: string | null
           estoque_minimo?: number
+          familia_olfativa?: string | null
           fornecedor?: string | null
           id?: string
           imagem_url?: string | null
@@ -241,6 +248,8 @@ export type Database = {
           preco_venda?: number
           quantidade_estoque?: number
           status?: string
+          tamanho_volume?: string | null
+          tipo_produto?: string
           updated_at?: string
           user_id?: string
           volume_ml?: number | null
