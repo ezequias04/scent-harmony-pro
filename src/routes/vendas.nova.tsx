@@ -17,7 +17,7 @@ export const Route = createFileRoute("/vendas/nova")({
   component: NovaVenda,
 });
 
-type Perfume = { id: string; nome: string; marca: string | null; preco_venda: number; preco_custo: number; quantidade_estoque: number };
+type Perfume = { id: string; nome: string; marca: string | null; tipo_produto: string; tamanho_volume: string | null; volume_ml: number | null; imagem_url: string | null; preco_venda: number; preco_custo: number; quantidade_estoque: number };
 
 type ItemForm = { perfume_id: string; quantidade: number };
 
@@ -30,7 +30,7 @@ function NovaVenda() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("perfumes")
-        .select("id, nome, marca, preco_venda, preco_custo, quantidade_estoque")
+        .select("id, nome, marca, tipo_produto, tamanho_volume, volume_ml, imagem_url, preco_venda, preco_custo, quantidade_estoque")
         .gt("quantidade_estoque", 0)
         .order("nome");
       if (error) throw error;
