@@ -107,7 +107,7 @@ function PerfumesPage() {
       const qtd = parseInt(form.quantidade);
       if (!qtd || qtd <= 0) throw new Error("Informe uma quantidade válida");
       const newQtd = perfume.quantidade_estoque + qtd;
-      const update: Record<string, unknown> = { quantidade_estoque: newQtd };
+      const update: { quantidade_estoque: number; preco_custo?: number; fornecedor?: string } = { quantidade_estoque: newQtd };
       if (form.preco_custo) update.preco_custo = parseFloat(form.preco_custo);
       if (form.fornecedor) update.fornecedor = form.fornecedor;
       const { error: e1 } = await supabase.from("perfumes").update(update).eq("id", perfume.id);
