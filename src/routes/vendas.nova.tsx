@@ -17,7 +17,7 @@ export const Route = createFileRoute("/vendas/nova")({
   component: NovaVenda,
 });
 
-type Perfume = { id: string; nome: string; marca: string | null; preco_venda: number; preco_custo: number; quantidade_estoque: number };
+type Perfume = { id: string; nome: string; marca: string | null; tipo_produto: string; tamanho_volume: string | null; volume_ml: number | null; imagem_url: string | null; preco_venda: number; preco_custo: number; quantidade_estoque: number };
 
 type ItemForm = { perfume_id: string; quantidade: number };
 
@@ -30,7 +30,7 @@ function NovaVenda() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("perfumes")
-        .select("id, nome, marca, preco_venda, preco_custo, quantidade_estoque")
+        .select("id, nome, marca, tipo_produto, tamanho_volume, volume_ml, imagem_url, preco_venda, preco_custo, quantidade_estoque")
         .gt("quantidade_estoque", 0)
         .order("nome");
       if (error) throw error;
@@ -127,7 +127,7 @@ function NovaVenda() {
         await supabase.from("movimentacoes_estoque").insert({
           user_id: user!.id,
           perfume_id: p.id,
-          tipo: "venda",
+          tipo: "saida_venda",
           quantidade: it.quantidade,
           motivo: `Venda ${venda.id.slice(0, 8)}`,
         });
@@ -166,7 +166,7 @@ function NovaVenda() {
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-base">Perfumes</CardTitle>
+          <CardTitle className="text-base">Produtos</CardTitle>
           <Button type="button" size="sm" variant="outline" onClick={addItem}>
             <Plus className="w-4 h-4 mr-1" /> Adicionar
           </Button>
@@ -175,20 +175,36 @@ function NovaVenda() {
           {itens.length === 0 && <p className="text-sm text-muted-foreground">Nenhum item adicionado.</p>}
           {itens.map((it, idx) => {
             const p = perfumes.find((x) => x.id === it.perfume_id);
+            const tamanho = p?.tamanho_volume || (p?.volume_ml ? `${p.volume_ml}ml` : "");
             return (
-              <div key={idx} className="flex gap-2 items-end">
-                <div className="flex-1">
-                  <Label className="text-xs">Perfume</Label>
+              <div key={idx} className="flex gap-2 items-start">
+                <div className="w-12 h-12 rounded-md bg-secondary overflow-hidden shrink-0 flex items-center justify-center mt-5">
+                  {p?.imagem_url ? (
+                    <img src={p.imagem_url} alt={p.nome} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-xs text-muted-foreground">—</span>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <Label className="text-xs">Produto</Label>
                   <Select value={it.perfume_id} onValueChange={(v) => updateItem(idx, { perfume_id: v })}>
                     <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                     <SelectContent>
-                      {perfumes.map((p) => (
-                        <SelectItem key={p.id} value={p.id}>
-                          {p.nome} {p.marca ? `(${p.marca})` : ""} — {fmtBRL(p.preco_venda)} • {p.quantidade_estoque} un
-                        </SelectItem>
-                      ))}
+                      {perfumes.map((pp) => {
+                        const t = pp.tamanho_volume || (pp.volume_ml ? `${pp.volume_ml}ml` : "");
+                        return (
+                          <SelectItem key={pp.id} value={pp.id}>
+                            [{pp.tipo_produto}] {pp.nome}{pp.marca ? ` (${pp.marca})` : ""}{t ? ` ${t}` : ""} — {fmtBRL(pp.preco_venda)} • {pp.quantidade_estoque} un
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
+                  {p && (
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {p.tipo_produto}{tamanho ? ` • ${tamanho}` : ""} • Estoque: {p.quantidade_estoque}
+                    </div>
+                  )}
                 </div>
                 <div className="w-20">
                   <Label className="text-xs">Qtd</Label>
@@ -196,7 +212,7 @@ function NovaVenda() {
                     value={it.quantidade}
                     onChange={(e) => updateItem(idx, { quantidade: Math.max(1, parseInt(e.target.value) || 1) })} />
                 </div>
-                <Button type="button" variant="ghost" size="icon" onClick={() => removeItem(idx)}>
+                <Button type="button" variant="ghost" size="icon" className="mt-5" onClick={() => removeItem(idx)}>
                   <Trash2 className="w-4 h-4 text-destructive" />
                 </Button>
               </div>

@@ -4,6 +4,7 @@ import {
   createRootRouteWithContext,
   HeadContent,
   Scripts,
+  useRouterState,
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
@@ -48,6 +49,9 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function Gate() {
   const { loading, session } = useAuth();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isPublic = pathname.startsWith("/c/");
+  if (isPublic) return <Outlet />;
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
