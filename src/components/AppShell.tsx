@@ -9,7 +9,7 @@ import { useState } from "react";
 
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/perfumes", label: "Perfumes", icon: SprayCan },
+  { to: "/perfumes", label: "Produtos", icon: SprayCan },
   { to: "/vendas", label: "Vendas", icon: ShoppingCart },
   { to: "/clientes", label: "Clientes", icon: Users },
   { to: "/catalogo", label: "Catálogo", icon: BookOpen },
