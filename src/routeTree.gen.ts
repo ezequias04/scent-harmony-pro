@@ -15,6 +15,7 @@ import { Route as ClientesRouteImport } from './routes/clientes'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VendasNovaRouteImport } from './routes/vendas.nova'
+import { Route as CatalogoSlugRouteImport } from './routes/catalogo.$slug'
 import { Route as CUserIdRouteImport } from './routes/c.$userId'
 
 const VendasRoute = VendasRouteImport.update({
@@ -47,6 +48,11 @@ const VendasNovaRoute = VendasNovaRouteImport.update({
   path: '/nova',
   getParentRoute: () => VendasRoute,
 } as any)
+const CatalogoSlugRoute = CatalogoSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => CatalogoRoute,
+} as any)
 const CUserIdRoute = CUserIdRouteImport.update({
   id: '/c/$userId',
   path: '/c/$userId',
@@ -55,30 +61,33 @@ const CUserIdRoute = CUserIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/catalogo': typeof CatalogoRoute
+  '/catalogo': typeof CatalogoRouteWithChildren
   '/clientes': typeof ClientesRoute
   '/perfumes': typeof PerfumesRoute
   '/vendas': typeof VendasRouteWithChildren
   '/c/$userId': typeof CUserIdRoute
+  '/catalogo/$slug': typeof CatalogoSlugRoute
   '/vendas/nova': typeof VendasNovaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/catalogo': typeof CatalogoRoute
+  '/catalogo': typeof CatalogoRouteWithChildren
   '/clientes': typeof ClientesRoute
   '/perfumes': typeof PerfumesRoute
   '/vendas': typeof VendasRouteWithChildren
   '/c/$userId': typeof CUserIdRoute
+  '/catalogo/$slug': typeof CatalogoSlugRoute
   '/vendas/nova': typeof VendasNovaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/catalogo': typeof CatalogoRoute
+  '/catalogo': typeof CatalogoRouteWithChildren
   '/clientes': typeof ClientesRoute
   '/perfumes': typeof PerfumesRoute
   '/vendas': typeof VendasRouteWithChildren
   '/c/$userId': typeof CUserIdRoute
+  '/catalogo/$slug': typeof CatalogoSlugRoute
   '/vendas/nova': typeof VendasNovaRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/perfumes'
     | '/vendas'
     | '/c/$userId'
+    | '/catalogo/$slug'
     | '/vendas/nova'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/perfumes'
     | '/vendas'
     | '/c/$userId'
+    | '/catalogo/$slug'
     | '/vendas/nova'
   id:
     | '__root__'
@@ -108,12 +119,13 @@ export interface FileRouteTypes {
     | '/perfumes'
     | '/vendas'
     | '/c/$userId'
+    | '/catalogo/$slug'
     | '/vendas/nova'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CatalogoRoute: typeof CatalogoRoute
+  CatalogoRoute: typeof CatalogoRouteWithChildren
   ClientesRoute: typeof ClientesRoute
   PerfumesRoute: typeof PerfumesRoute
   VendasRoute: typeof VendasRouteWithChildren
@@ -164,6 +176,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VendasNovaRouteImport
       parentRoute: typeof VendasRoute
     }
+    '/catalogo/$slug': {
+      id: '/catalogo/$slug'
+      path: '/$slug'
+      fullPath: '/catalogo/$slug'
+      preLoaderRoute: typeof CatalogoSlugRouteImport
+      parentRoute: typeof CatalogoRoute
+    }
     '/c/$userId': {
       id: '/c/$userId'
       path: '/c/$userId'
@@ -173,6 +192,18 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface CatalogoRouteChildren {
+  CatalogoSlugRoute: typeof CatalogoSlugRoute
+}
+
+const CatalogoRouteChildren: CatalogoRouteChildren = {
+  CatalogoSlugRoute: CatalogoSlugRoute,
+}
+
+const CatalogoRouteWithChildren = CatalogoRoute._addFileChildren(
+  CatalogoRouteChildren,
+)
 
 interface VendasRouteChildren {
   VendasNovaRoute: typeof VendasNovaRoute
@@ -187,7 +218,7 @@ const VendasRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CatalogoRoute: CatalogoRoute,
+  CatalogoRoute: CatalogoRouteWithChildren,
   ClientesRoute: ClientesRoute,
   PerfumesRoute: PerfumesRoute,
   VendasRoute: VendasRouteWithChildren,
@@ -196,3 +227,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
