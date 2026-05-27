@@ -107,13 +107,9 @@ function MobileFab() {
     <button
       aria-label={label}
       onClick={() => {
-        if (target === "/vendas/nova") {
-          navigate({ to: "/vendas/nova" });
-        } else if (target === "/clientes") {
-          navigate({ to: "/clientes", search: { novo: 1 } as never });
-        } else {
-          navigate({ to: "/perfumes", search: { novo: 1 } as never });
-        }
+        if (target === "/vendas/nova") navigate({ to: "/vendas/nova" });
+        else if (target === "/clientes") navigate({ to: "/clientes" });
+        else navigate({ to: "/perfumes" });
       }}
       className="md:hidden fixed right-4 z-40 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center active:scale-95 transition"
       style={{ bottom: "calc(env(safe-area-inset-bottom) + 72px)" }}
