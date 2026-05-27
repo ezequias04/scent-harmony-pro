@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VendasRouteImport } from './routes/vendas'
 import { Route as PerfumesRouteImport } from './routes/perfumes'
+import { Route as PedidosRouteImport } from './routes/pedidos'
 import { Route as ClientesRouteImport } from './routes/clientes'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as IndexRouteImport } from './routes/index'
@@ -27,6 +28,11 @@ const VendasRoute = VendasRouteImport.update({
 const PerfumesRoute = PerfumesRouteImport.update({
   id: '/perfumes',
   path: '/perfumes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PedidosRoute = PedidosRouteImport.update({
+  id: '/pedidos',
+  path: '/pedidos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClientesRoute = ClientesRouteImport.update({
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/catalogo': typeof CatalogoRouteWithChildren
   '/clientes': typeof ClientesRoute
+  '/pedidos': typeof PedidosRoute
   '/perfumes': typeof PerfumesRoute
   '/vendas': typeof VendasRouteWithChildren
   '/c/$userId': typeof CUserIdRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/catalogo': typeof CatalogoRouteWithChildren
   '/clientes': typeof ClientesRoute
+  '/pedidos': typeof PedidosRoute
   '/perfumes': typeof PerfumesRoute
   '/vendas': typeof VendasRouteWithChildren
   '/c/$userId': typeof CUserIdRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/catalogo': typeof CatalogoRouteWithChildren
   '/clientes': typeof ClientesRoute
+  '/pedidos': typeof PedidosRoute
   '/perfumes': typeof PerfumesRoute
   '/vendas': typeof VendasRouteWithChildren
   '/c/$userId': typeof CUserIdRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/'
     | '/catalogo'
     | '/clientes'
+    | '/pedidos'
     | '/perfumes'
     | '/vendas'
     | '/c/$userId'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/'
     | '/catalogo'
     | '/clientes'
+    | '/pedidos'
     | '/perfumes'
     | '/vendas'
     | '/c/$userId'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/catalogo'
     | '/clientes'
+    | '/pedidos'
     | '/perfumes'
     | '/vendas'
     | '/c/$userId'
@@ -139,6 +151,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CatalogoRoute: typeof CatalogoRouteWithChildren
   ClientesRoute: typeof ClientesRoute
+  PedidosRoute: typeof PedidosRoute
   PerfumesRoute: typeof PerfumesRoute
   VendasRoute: typeof VendasRouteWithChildren
   CUserIdRoute: typeof CUserIdRoute
@@ -159,6 +172,13 @@ declare module '@tanstack/react-router' {
       path: '/perfumes'
       fullPath: '/perfumes'
       preLoaderRoute: typeof PerfumesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pedidos': {
+      id: '/pedidos'
+      path: '/pedidos'
+      fullPath: '/pedidos'
+      preLoaderRoute: typeof PedidosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/clientes': {
@@ -240,6 +260,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CatalogoRoute: CatalogoRouteWithChildren,
   ClientesRoute: ClientesRoute,
+  PedidosRoute: PedidosRoute,
   PerfumesRoute: PerfumesRoute,
   VendasRoute: VendasRouteWithChildren,
   CUserIdRoute: CUserIdRoute,
