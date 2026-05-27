@@ -126,21 +126,38 @@ function CatalogoPage() {
         <p className="text-muted-foreground text-sm">{filtered.length} produtos disponíveis</p>
       </div>
 
-      {publicUrl && (
-        <Card className="bg-secondary/30">
-          <CardContent className="p-4 space-y-2">
-            <div className="text-sm font-medium">Link público do seu catálogo</div>
-            <div className="flex gap-2">
-              <Input readOnly value={publicUrl} className="font-mono text-xs" />
-              <Button variant="outline" size="icon" onClick={copyLink}><Copy className="w-4 h-4" /></Button>
-              <a href={publicUrl} target="_blank" rel="noreferrer">
-                <Button variant="outline" size="icon"><ExternalLink className="w-4 h-4" /></Button>
-              </a>
+      <Card className="bg-secondary/30">
+        <CardContent className="p-4 space-y-3">
+          <div className="text-sm font-medium">Link público do seu catálogo</div>
+          <div className="grid sm:grid-cols-2 gap-2">
+            <div>
+              <Label className="text-xs">Nome da loja</Label>
+              <Input value={nomeLoja} onChange={(e) => setNomeLoja(e.target.value)} placeholder="Minha Perfumaria" maxLength={80} />
             </div>
-            <p className="text-xs text-muted-foreground">Compartilhe esse link com seus clientes — eles veem fotos, preços e pedem pelo WhatsApp.</p>
-          </CardContent>
-        </Card>
-      )}
+            <div>
+              <Label className="text-xs">Endereço (slug)</Label>
+              <div className="flex gap-1">
+                <span className="inline-flex items-center px-2 text-xs text-muted-foreground bg-background border border-border rounded-md">/catalogo/</span>
+                <Input value={slugInput} onChange={(e) => setSlugInput(e.target.value)} placeholder="minhaloja" maxLength={60} />
+              </div>
+            </div>
+          </div>
+          <Button size="sm" onClick={saveSlug}>Salvar link</Button>
+          {publicUrl && (
+            <>
+              <div className="flex gap-2 pt-2 border-t border-border">
+                <Input readOnly value={publicUrl} className="font-mono text-xs" />
+                <Button variant="outline" size="icon" onClick={copyLink}><Copy className="w-4 h-4" /></Button>
+                <a href={publicUrl} target="_blank" rel="noreferrer">
+                  <Button variant="outline" size="icon"><ExternalLink className="w-4 h-4" /></Button>
+                </a>
+              </div>
+              <p className="text-xs text-muted-foreground">Compartilhe — clientes adicionam à sacola e enviam pedidos direto pra aba Pedidos.</p>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
 
       <Card>
         <CardContent className="p-4 space-y-3">
