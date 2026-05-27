@@ -64,7 +64,40 @@ function CatalogoPage() {
     });
   }, [perfumes, filtroCat, filtroTipo, filtroMarca, precoMin, precoMax, apenasPromo]);
 
-  const publicUrl = user ? `${window.location.origin}/c/${user.id}` : "";
+  const { data: loja, refetch: refetchLoja } = useQuery({
+    queryKey: ["loja", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase.from("lojas").select("*").eq("user_id", user!.id).maybeSingle();
+      return data;
+    },
+  });
+
+  const [slugInput, setSlugInput] = useState("");
+  const [nomeLoja, setNomeLoja] = useState("");
+  const slugSaving = useRef(false);
+  const saveSlug = async () => {
+    const s = slugInput.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+    if (s.length < 3) return toast.error("Use ao menos 3 caracteres (a-z, 0-9, -)");
+    if (slugSaving.current) return;
+    slugSaving.current = true;
+    try {
+      const payload = { user_id: user!.id, slug: s, nome_loja: nomeLoja.trim() || null };
+      const { error } = loja
+        ? await supabase.from("lojas").update(payload).eq("id", loja.id)
+        : await supabase.from("lojas").insert(payload);
+      if (error) {
+        if (error.code === "23505") toast.error("Esse link já está em uso, escolha outro");
+        else toast.error(error.message);
+        return;
+      }
+      toast.success("Link da loja salvo!");
+      refetchLoja();
+    } finally { slugSaving.current = false; }
+  };
+
+  const slugUrl = loja ? `${window.location.origin}/catalogo/${loja.slug}` : "";
+  const publicUrl = slugUrl || (user ? `${window.location.origin}/c/${user.id}` : "");
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(publicUrl);
