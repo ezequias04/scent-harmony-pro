@@ -1,0 +1,26 @@
+{
+  "name": "Gestor de Perfumes",
+  "short_name": "Gestor",
+  "description": "Controle de vendas, estoque, clientes e catálogo para revenda de perfumes e produtos de beleza.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7f1e8",
+  "theme_color": "#7a1f2b",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
