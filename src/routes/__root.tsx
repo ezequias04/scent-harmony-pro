@@ -4,6 +4,7 @@ import {
   createRootRouteWithContext,
   HeadContent,
   Scripts,
+  useRouterState,
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
@@ -11,6 +12,8 @@ import { AuthProvider, useAuth } from "@/lib/auth-context";
 import { LoginScreen } from "@/components/LoginScreen";
 import { AppShell } from "@/components/AppShell";
 import { Toaster } from "@/components/ui/sonner";
+
+const PUBLIC_PREFIXES = ["/c/", "/catalogo/", "/pedido/"];
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -59,6 +62,9 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function Gate() {
   const { loading, session } = useAuth();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isPublic = PUBLIC_PREFIXES.some((p) => pathname.startsWith(p));
+  if (isPublic) return <Outlet />;
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">

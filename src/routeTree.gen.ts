@@ -11,10 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VendasRouteImport } from './routes/vendas'
 import { Route as PerfumesRouteImport } from './routes/perfumes'
+import { Route as PedidosRouteImport } from './routes/pedidos'
 import { Route as ClientesRouteImport } from './routes/clientes'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VendasNovaRouteImport } from './routes/vendas.nova'
+import { Route as PedidoSucessoRouteImport } from './routes/pedido.sucesso'
+import { Route as CatalogoSlugRouteImport } from './routes/catalogo.$slug'
 import { Route as CUserIdRouteImport } from './routes/c.$userId'
 
 const VendasRoute = VendasRouteImport.update({
@@ -25,6 +28,11 @@ const VendasRoute = VendasRouteImport.update({
 const PerfumesRoute = PerfumesRouteImport.update({
   id: '/perfumes',
   path: '/perfumes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PedidosRoute = PedidosRouteImport.update({
+  id: '/pedidos',
+  path: '/pedidos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClientesRoute = ClientesRouteImport.update({
@@ -47,6 +55,16 @@ const VendasNovaRoute = VendasNovaRouteImport.update({
   path: '/nova',
   getParentRoute: () => VendasRoute,
 } as any)
+const PedidoSucessoRoute = PedidoSucessoRouteImport.update({
+  id: '/pedido/sucesso',
+  path: '/pedido/sucesso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatalogoSlugRoute = CatalogoSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => CatalogoRoute,
+} as any)
 const CUserIdRoute = CUserIdRouteImport.update({
   id: '/c/$userId',
   path: '/c/$userId',
@@ -55,30 +73,39 @@ const CUserIdRoute = CUserIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/catalogo': typeof CatalogoRoute
+  '/catalogo': typeof CatalogoRouteWithChildren
   '/clientes': typeof ClientesRoute
+  '/pedidos': typeof PedidosRoute
   '/perfumes': typeof PerfumesRoute
   '/vendas': typeof VendasRouteWithChildren
   '/c/$userId': typeof CUserIdRoute
+  '/catalogo/$slug': typeof CatalogoSlugRoute
+  '/pedido/sucesso': typeof PedidoSucessoRoute
   '/vendas/nova': typeof VendasNovaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/catalogo': typeof CatalogoRoute
+  '/catalogo': typeof CatalogoRouteWithChildren
   '/clientes': typeof ClientesRoute
+  '/pedidos': typeof PedidosRoute
   '/perfumes': typeof PerfumesRoute
   '/vendas': typeof VendasRouteWithChildren
   '/c/$userId': typeof CUserIdRoute
+  '/catalogo/$slug': typeof CatalogoSlugRoute
+  '/pedido/sucesso': typeof PedidoSucessoRoute
   '/vendas/nova': typeof VendasNovaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/catalogo': typeof CatalogoRoute
+  '/catalogo': typeof CatalogoRouteWithChildren
   '/clientes': typeof ClientesRoute
+  '/pedidos': typeof PedidosRoute
   '/perfumes': typeof PerfumesRoute
   '/vendas': typeof VendasRouteWithChildren
   '/c/$userId': typeof CUserIdRoute
+  '/catalogo/$slug': typeof CatalogoSlugRoute
+  '/pedido/sucesso': typeof PedidoSucessoRoute
   '/vendas/nova': typeof VendasNovaRoute
 }
 export interface FileRouteTypes {
@@ -87,37 +114,48 @@ export interface FileRouteTypes {
     | '/'
     | '/catalogo'
     | '/clientes'
+    | '/pedidos'
     | '/perfumes'
     | '/vendas'
     | '/c/$userId'
+    | '/catalogo/$slug'
+    | '/pedido/sucesso'
     | '/vendas/nova'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/catalogo'
     | '/clientes'
+    | '/pedidos'
     | '/perfumes'
     | '/vendas'
     | '/c/$userId'
+    | '/catalogo/$slug'
+    | '/pedido/sucesso'
     | '/vendas/nova'
   id:
     | '__root__'
     | '/'
     | '/catalogo'
     | '/clientes'
+    | '/pedidos'
     | '/perfumes'
     | '/vendas'
     | '/c/$userId'
+    | '/catalogo/$slug'
+    | '/pedido/sucesso'
     | '/vendas/nova'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CatalogoRoute: typeof CatalogoRoute
+  CatalogoRoute: typeof CatalogoRouteWithChildren
   ClientesRoute: typeof ClientesRoute
+  PedidosRoute: typeof PedidosRoute
   PerfumesRoute: typeof PerfumesRoute
   VendasRoute: typeof VendasRouteWithChildren
   CUserIdRoute: typeof CUserIdRoute
+  PedidoSucessoRoute: typeof PedidoSucessoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -134,6 +172,13 @@ declare module '@tanstack/react-router' {
       path: '/perfumes'
       fullPath: '/perfumes'
       preLoaderRoute: typeof PerfumesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pedidos': {
+      id: '/pedidos'
+      path: '/pedidos'
+      fullPath: '/pedidos'
+      preLoaderRoute: typeof PedidosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/clientes': {
@@ -164,6 +209,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VendasNovaRouteImport
       parentRoute: typeof VendasRoute
     }
+    '/pedido/sucesso': {
+      id: '/pedido/sucesso'
+      path: '/pedido/sucesso'
+      fullPath: '/pedido/sucesso'
+      preLoaderRoute: typeof PedidoSucessoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catalogo/$slug': {
+      id: '/catalogo/$slug'
+      path: '/$slug'
+      fullPath: '/catalogo/$slug'
+      preLoaderRoute: typeof CatalogoSlugRouteImport
+      parentRoute: typeof CatalogoRoute
+    }
     '/c/$userId': {
       id: '/c/$userId'
       path: '/c/$userId'
@@ -173,6 +232,18 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface CatalogoRouteChildren {
+  CatalogoSlugRoute: typeof CatalogoSlugRoute
+}
+
+const CatalogoRouteChildren: CatalogoRouteChildren = {
+  CatalogoSlugRoute: CatalogoSlugRoute,
+}
+
+const CatalogoRouteWithChildren = CatalogoRoute._addFileChildren(
+  CatalogoRouteChildren,
+)
 
 interface VendasRouteChildren {
   VendasNovaRoute: typeof VendasNovaRoute
@@ -187,11 +258,13 @@ const VendasRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CatalogoRoute: CatalogoRoute,
+  CatalogoRoute: CatalogoRouteWithChildren,
   ClientesRoute: ClientesRoute,
+  PedidosRoute: PedidosRoute,
   PerfumesRoute: PerfumesRoute,
   VendasRoute: VendasRouteWithChildren,
   CUserIdRoute: CUserIdRoute,
+  PedidoSucessoRoute: PedidoSucessoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
