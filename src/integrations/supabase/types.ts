@@ -23,8 +23,10 @@ export type Database = {
           instagram: string | null
           nome: string
           observacoes: string | null
+          origem_cliente: string | null
           preferencias: string | null
           telefone: string | null
+          telefone_whatsapp: string | null
           updated_at: string
           user_id: string
           whatsapp: string | null
@@ -37,8 +39,10 @@ export type Database = {
           instagram?: string | null
           nome: string
           observacoes?: string | null
+          origem_cliente?: string | null
           preferencias?: string | null
           telefone?: string | null
+          telefone_whatsapp?: string | null
           updated_at?: string
           user_id: string
           whatsapp?: string | null
@@ -51,8 +55,10 @@ export type Database = {
           instagram?: string | null
           nome?: string
           observacoes?: string | null
+          origem_cliente?: string | null
           preferencias?: string | null
           telefone?: string | null
+          telefone_whatsapp?: string | null
           updated_at?: string
           user_id?: string
           whatsapp?: string | null
@@ -94,6 +100,53 @@ export type Database = {
           valor?: number
         }
         Relationships: []
+      }
+      itens_pedido: {
+        Row: {
+          created_at: string
+          id: string
+          imagem_produto_snapshot: string | null
+          nome_produto_snapshot: string
+          pedido_id: string
+          preco_unitario: number
+          produto_id: string
+          quantidade: number
+          total_item: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          imagem_produto_snapshot?: string | null
+          nome_produto_snapshot: string
+          pedido_id: string
+          preco_unitario: number
+          produto_id: string
+          quantidade: number
+          total_item: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          imagem_produto_snapshot?: string | null
+          nome_produto_snapshot?: string
+          pedido_id?: string
+          preco_unitario?: number
+          produto_id?: string
+          quantidade?: number
+          total_item?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itens_pedido_pedido_id_fkey"
+            columns: ["pedido_id"]
+            isOneToOne: false
+            referencedRelation: "pedidos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       itens_venda: {
         Row: {
@@ -146,6 +199,33 @@ export type Database = {
           },
         ]
       }
+      lojas: {
+        Row: {
+          created_at: string
+          id: string
+          nome_loja: string | null
+          slug: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome_loja?: string | null
+          slug: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome_loja?: string | null
+          slug?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       movimentacoes_estoque: {
         Row: {
           created_at: string
@@ -186,6 +266,119 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      parcelas_venda: {
+        Row: {
+          created_at: string
+          data_pagamento: string | null
+          data_vencimento: string
+          id: string
+          numero_parcela: number
+          observacoes: string | null
+          status_parcela: string
+          updated_at: string
+          user_id: string
+          valor_parcela: number
+          venda_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_pagamento?: string | null
+          data_vencimento: string
+          id?: string
+          numero_parcela: number
+          observacoes?: string | null
+          status_parcela?: string
+          updated_at?: string
+          user_id: string
+          valor_parcela: number
+          venda_id: string
+        }
+        Update: {
+          created_at?: string
+          data_pagamento?: string | null
+          data_vencimento?: string
+          id?: string
+          numero_parcela?: number
+          observacoes?: string | null
+          status_parcela?: string
+          updated_at?: string
+          user_id?: string
+          valor_parcela?: number
+          venda_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parcelas_venda_venda_id_fkey"
+            columns: ["venda_id"]
+            isOneToOne: false
+            referencedRelation: "vendas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pedidos: {
+        Row: {
+          cliente_id: string | null
+          codigo_pedido: string
+          created_at: string
+          data_pedido: string
+          desconto: number
+          endereco: string | null
+          id: string
+          instagram: string | null
+          nome_cliente: string
+          observacoes_cliente: string | null
+          observacoes_internas: string | null
+          status_pedido: string
+          subtotal: number
+          telefone_whatsapp: string
+          total: number
+          updated_at: string
+          user_id: string
+          venda_id: string | null
+        }
+        Insert: {
+          cliente_id?: string | null
+          codigo_pedido: string
+          created_at?: string
+          data_pedido?: string
+          desconto?: number
+          endereco?: string | null
+          id?: string
+          instagram?: string | null
+          nome_cliente: string
+          observacoes_cliente?: string | null
+          observacoes_internas?: string | null
+          status_pedido?: string
+          subtotal?: number
+          telefone_whatsapp: string
+          total?: number
+          updated_at?: string
+          user_id: string
+          venda_id?: string | null
+        }
+        Update: {
+          cliente_id?: string | null
+          codigo_pedido?: string
+          created_at?: string
+          data_pedido?: string
+          desconto?: number
+          endereco?: string | null
+          id?: string
+          instagram?: string | null
+          nome_cliente?: string
+          observacoes_cliente?: string | null
+          observacoes_internas?: string | null
+          status_pedido?: string
+          subtotal?: number
+          telefone_whatsapp?: string
+          total?: number
+          updated_at?: string
+          user_id?: string
+          venda_id?: string | null
+        }
+        Relationships: []
       }
       perfumes: {
         Row: {
@@ -261,49 +454,70 @@ export type Database = {
           cliente_id: string | null
           created_at: string
           custo_total: number
+          data_vencimento: string | null
           data_venda: string
           desconto: number
           forma_pagamento: string | null
           id: string
           lucro_total: number
           observacoes: string | null
+          origem_venda: string
+          pedido_id: string | null
+          quantidade_parcelas: number
           status_pagamento: string
           subtotal: number
+          tipo_venda: string
           total: number
           updated_at: string
           user_id: string
+          valor_pago: number
+          valor_pendente: number
         }
         Insert: {
           cliente_id?: string | null
           created_at?: string
           custo_total?: number
+          data_vencimento?: string | null
           data_venda?: string
           desconto?: number
           forma_pagamento?: string | null
           id?: string
           lucro_total?: number
           observacoes?: string | null
+          origem_venda?: string
+          pedido_id?: string | null
+          quantidade_parcelas?: number
           status_pagamento?: string
           subtotal?: number
+          tipo_venda?: string
           total?: number
           updated_at?: string
           user_id: string
+          valor_pago?: number
+          valor_pendente?: number
         }
         Update: {
           cliente_id?: string | null
           created_at?: string
           custo_total?: number
+          data_vencimento?: string | null
           data_venda?: string
           desconto?: number
           forma_pagamento?: string | null
           id?: string
           lucro_total?: number
           observacoes?: string | null
+          origem_venda?: string
+          pedido_id?: string | null
+          quantidade_parcelas?: number
           status_pagamento?: string
           subtotal?: number
+          tipo_venda?: string
           total?: number
           updated_at?: string
           user_id?: string
+          valor_pago?: number
+          valor_pendente?: number
         }
         Relationships: [
           {
