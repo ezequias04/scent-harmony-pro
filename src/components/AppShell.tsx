@@ -1,5 +1,5 @@
-import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, SprayCan, ShoppingCart, Users, BookOpen, LogOut, Sparkles, Menu } from "lucide-react";
+import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
+import { LayoutDashboard, SprayCan, ShoppingCart, Users, BookOpen, LogOut, Sparkles, Menu, Plus } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -14,6 +14,9 @@ const nav = [
   { to: "/clientes", label: "Clientes", icon: Users },
   { to: "/catalogo", label: "Catálogo", icon: BookOpen },
 ] as const;
+
+// Bottom nav shows 5 most-used items on mobile
+const bottomNav = nav;
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -57,6 +60,69 @@ function Brand() {
   );
 }
 
+function MobileBottomNav() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  return (
+    <nav
+      className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-card/95 backdrop-blur border-t border-border"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
+      <ul className="grid grid-cols-5">
+        {bottomNav.map((item) => {
+          const Icon = item.icon;
+          const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+          return (
+            <li key={item.to}>
+              <Link
+                to={item.to}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium transition-colors",
+                  active ? "text-primary" : "text-muted-foreground"
+                )}
+              >
+                <Icon className={cn("w-5 h-5", active && "scale-110")} />
+                <span>{item.label}</span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+}
+
+function MobileFab() {
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  // Context-aware target
+  const target =
+    pathname.startsWith("/clientes") ? "/clientes" :
+    pathname.startsWith("/perfumes") ? "/perfumes" :
+    "/vendas/nova";
+  const label =
+    target === "/clientes" ? "Novo cliente" :
+    target === "/perfumes" ? "Novo produto" :
+    "Nova venda";
+  return (
+    <button
+      aria-label={label}
+      onClick={() => {
+        if (target === "/vendas/nova") {
+          navigate({ to: "/vendas/nova" });
+        } else if (target === "/clientes") {
+          navigate({ to: "/clientes", search: { novo: 1 } as never });
+        } else {
+          navigate({ to: "/perfumes", search: { novo: 1 } as never });
+        }
+      }}
+      className="md:hidden fixed right-4 z-40 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center active:scale-95 transition"
+      style={{ bottom: "calc(env(safe-area-inset-bottom) + 72px)" }}
+    >
+      <Plus className="w-6 h-6" />
+    </button>
+  );
+}
+
 export function AppShell({ children }: { children: ReactNode }) {
   const { signOut, user } = useAuth();
   const [open, setOpen] = useState(false);
@@ -96,6 +162,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Brand />
               <NavLinks onNavigate={() => setOpen(false)} />
               <div className="p-3 border-t border-sidebar-border">
+                <div className="text-xs text-muted-foreground px-3 pb-2 truncate">{user?.email}</div>
                 <Button variant="ghost" size="sm" className="w-full justify-start" onClick={signOut}>
                   <LogOut className="w-4 h-4 mr-2" /> Sair
                 </Button>
@@ -104,11 +171,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Sheet>
         </header>
 
-        <main className="flex-1 overflow-x-hidden">
+        <main className="flex-1 overflow-x-hidden pb-20 md:pb-0">
           <div className="container mx-auto max-w-6xl px-4 py-6 md:py-8">
             {children}
           </div>
         </main>
+
+        <MobileFab />
+        <MobileBottomNav />
       </div>
     </div>
   );
