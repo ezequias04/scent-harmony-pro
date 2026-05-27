@@ -75,6 +75,9 @@ function CatalogoPage() {
 
   const [slugInput, setSlugInput] = useState("");
   const [nomeLoja, setNomeLoja] = useState("");
+  useEffect(() => {
+    if (loja) { setSlugInput(loja.slug ?? ""); setNomeLoja(loja.nome_loja ?? ""); }
+  }, [loja]);
   const slugSaving = useRef(false);
   const saveSlug = async () => {
     const s = slugInput.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
