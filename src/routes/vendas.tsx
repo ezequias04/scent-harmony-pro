@@ -11,17 +11,22 @@ import { Plus, ShoppingCart, Receipt, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/vendas")({
-  component: VendasPage,
+  component: VendasRouteComponent,
 });
 
-function VendasPage() {
+function VendasRouteComponent() {
   const location = useLocation();
-  const qc = useQueryClient();
-  const { user } = useAuth();
 
   if (location.pathname !== "/vendas") {
     return <Outlet />;
   }
+
+  return <VendasPage />;
+}
+
+function VendasPage() {
+  const qc = useQueryClient();
+  const { user } = useAuth();
 
   const { data: vendas = [], isLoading } = useQuery({
     queryKey: ["vendas"],
