@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VendasRouteImport } from './routes/vendas'
+import { Route as RelatoriosRouteImport } from './routes/relatorios'
 import { Route as PerfumesRouteImport } from './routes/perfumes'
 import { Route as PedidosRouteImport } from './routes/pedidos'
 import { Route as ClientesRouteImport } from './routes/clientes'
@@ -23,6 +24,11 @@ import { Route as CUserIdRouteImport } from './routes/c.$userId'
 const VendasRoute = VendasRouteImport.update({
   id: '/vendas',
   path: '/vendas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RelatoriosRoute = RelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PerfumesRoute = PerfumesRouteImport.update({
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/clientes': typeof ClientesRoute
   '/pedidos': typeof PedidosRoute
   '/perfumes': typeof PerfumesRoute
+  '/relatorios': typeof RelatoriosRoute
   '/vendas': typeof VendasRouteWithChildren
   '/c/$userId': typeof CUserIdRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByTo {
   '/clientes': typeof ClientesRoute
   '/pedidos': typeof PedidosRoute
   '/perfumes': typeof PerfumesRoute
+  '/relatorios': typeof RelatoriosRoute
   '/vendas': typeof VendasRouteWithChildren
   '/c/$userId': typeof CUserIdRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
@@ -102,6 +110,7 @@ export interface FileRoutesById {
   '/clientes': typeof ClientesRoute
   '/pedidos': typeof PedidosRoute
   '/perfumes': typeof PerfumesRoute
+  '/relatorios': typeof RelatoriosRoute
   '/vendas': typeof VendasRouteWithChildren
   '/c/$userId': typeof CUserIdRoute
   '/catalogo/$slug': typeof CatalogoSlugRoute
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/pedidos'
     | '/perfumes'
+    | '/relatorios'
     | '/vendas'
     | '/c/$userId'
     | '/catalogo/$slug'
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/pedidos'
     | '/perfumes'
+    | '/relatorios'
     | '/vendas'
     | '/c/$userId'
     | '/catalogo/$slug'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/clientes'
     | '/pedidos'
     | '/perfumes'
+    | '/relatorios'
     | '/vendas'
     | '/c/$userId'
     | '/catalogo/$slug'
@@ -153,6 +165,7 @@ export interface RootRouteChildren {
   ClientesRoute: typeof ClientesRoute
   PedidosRoute: typeof PedidosRoute
   PerfumesRoute: typeof PerfumesRoute
+  RelatoriosRoute: typeof RelatoriosRoute
   VendasRoute: typeof VendasRouteWithChildren
   CUserIdRoute: typeof CUserIdRoute
   PedidoSucessoRoute: typeof PedidoSucessoRoute
@@ -165,6 +178,13 @@ declare module '@tanstack/react-router' {
       path: '/vendas'
       fullPath: '/vendas'
       preLoaderRoute: typeof VendasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/relatorios': {
+      id: '/relatorios'
+      path: '/relatorios'
+      fullPath: '/relatorios'
+      preLoaderRoute: typeof RelatoriosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/perfumes': {
@@ -262,6 +282,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClientesRoute: ClientesRoute,
   PedidosRoute: PedidosRoute,
   PerfumesRoute: PerfumesRoute,
+  RelatoriosRoute: RelatoriosRoute,
   VendasRoute: VendasRouteWithChildren,
   CUserIdRoute: CUserIdRoute,
   PedidoSucessoRoute: PedidoSucessoRoute,
@@ -269,13 +290,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -70,6 +70,12 @@ function VendasPage() {
         .update({ status_pagamento: "cancelado" })
         .eq("id", venda.id);
       if (error) throw error;
+      // Cancela parcelas pendentes
+      await supabase
+        .from("parcelas_venda")
+        .update({ status_parcela: "cancelado" })
+        .eq("venda_id", venda.id)
+        .eq("status_parcela", "pendente");
     },
     onSuccess: () => {
       toast.success("Venda cancelada e estoque devolvido");
