@@ -209,7 +209,14 @@ function NovaVenda() {
           </Button>
         </CardHeader>
         <CardContent className="space-y-3">
-          {itens.length === 0 && <p className="text-sm text-muted-foreground">Nenhum item adicionado.</p>}
+          {perfumes.length === 0 && (
+            <div className="text-sm text-muted-foreground p-3 rounded border border-dashed border-border">
+              Você ainda não tem produtos cadastrados. Cadastre um produto em <strong>Produtos</strong> antes de registrar uma venda.
+            </div>
+          )}
+          {itens.length === 0 && perfumes.length > 0 && (
+            <p className="text-sm text-muted-foreground">Nenhum item adicionado. Clique em <strong>Adicionar</strong> para incluir um produto.</p>
+          )}
           {itens.map((it, idx) => {
             const p = perfumes.find((x) => x.id === it.perfume_id);
             const tamanho = p?.tamanho_volume || (p?.volume_ml ? `${p.volume_ml}ml` : "");
@@ -229,23 +236,25 @@ function NovaVenda() {
                     <SelectContent>
                       {perfumes.map((pp) => {
                         const t = pp.tamanho_volume || (pp.volume_ml ? `${pp.volume_ml}ml` : "");
+                        const semEstoque = pp.quantidade_estoque <= 0;
                         return (
-                          <SelectItem key={pp.id} value={pp.id}>
-                            [{pp.tipo_produto}] {pp.nome}{pp.marca ? ` (${pp.marca})` : ""}{t ? ` ${t}` : ""} — {fmtBRL(pp.preco_venda)} • {pp.quantidade_estoque} un
+                          <SelectItem key={pp.id} value={pp.id} disabled={semEstoque}>
+                            {pp.nome}{pp.marca ? ` (${pp.marca})` : ""}{t ? ` • ${t}` : ""} — {fmtBRL(pp.preco_venda)} • {semEstoque ? "esgotado" : `${pp.quantidade_estoque} un`}
                           </SelectItem>
                         );
                       })}
                     </SelectContent>
                   </Select>
                   {p && (
-                    <div className="text-xs text-muted-foreground mt-1">
+                    <div className={`text-xs mt-1 ${p.quantidade_estoque <= 0 ? "text-destructive" : "text-muted-foreground"}`}>
                       {p.tipo_produto}{tamanho ? ` • ${tamanho}` : ""} • Estoque: {p.quantidade_estoque}
+                      {p.quantidade_estoque <= 0 && " — sem estoque"}
                     </div>
                   )}
                 </div>
                 <div className="w-20">
                   <Label className="text-xs">Qtd</Label>
-                  <Input type="number" min={1} max={p?.quantidade_estoque}
+                  <Input type="number" min={1} max={p?.quantidade_estoque || undefined}
                     value={it.quantidade}
                     onChange={(e) => updateItem(idx, { quantidade: Math.max(1, parseInt(e.target.value) || 1) })} />
                 </div>
