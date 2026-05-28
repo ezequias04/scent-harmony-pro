@@ -51,7 +51,10 @@ function NovaVenda() {
   const [itens, setItens] = useState<ItemForm[]>([]);
   const [desconto, setDesconto] = useState("0");
   const [forma, setForma] = useState("pix");
-  const [status, setStatus] = useState("pago");
+  const [tipoVenda, setTipoVenda] = useState<"a_vista" | "a_prazo">("a_vista");
+  const [parcelas, setParcelas] = useState("1");
+  const [vencimento, setVencimento] = useState("");
+  const [valorPagoPrazo, setValorPagoPrazo] = useState("0");
   const [obs, setObs] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -86,6 +89,12 @@ function NovaVenda() {
     }
     setSaving(true);
     try {
+      const isPrazo = tipoVenda === "a_prazo";
+      const nParc = isPrazo ? Math.max(1, parseInt(parcelas) || 1) : 1;
+      const valorPago = isPrazo ? Math.min(parseFloat(valorPagoPrazo) || 0, total) : total;
+      const valorPendente = Math.max(0, total - valorPago);
+      const statusPag = valorPendente <= 0.0001 ? "pago" : "pendente";
+
       const { data: venda, error: ev } = await supabase
         .from("vendas")
         .insert({
@@ -97,7 +106,13 @@ function NovaVenda() {
           custo_total: custoTotal,
           lucro_total: lucro,
           forma_pagamento: forma,
-          status_pagamento: status,
+          status_pagamento: statusPag,
+          tipo_venda: tipoVenda,
+          valor_pago: valorPago,
+          valor_pendente: valorPendente,
+          quantidade_parcelas: nParc,
+          data_vencimento: isPrazo && vencimento ? vencimento : null,
+          origem_venda: "manual",
           observacoes: obs || null,
         })
         .select()
@@ -118,6 +133,25 @@ function NovaVenda() {
       });
       const { error: ei } = await supabase.from("itens_venda").insert(itensRows);
       if (ei) throw ei;
+
+      // Parcelas
+      if (isPrazo && nParc > 1) {
+        const valorParcela = Number((total / nParc).toFixed(2));
+        const base = vencimento ? new Date(vencimento + "T00:00:00") : new Date();
+        const rows = Array.from({ length: nParc }, (_, i) => {
+          const d = new Date(base);
+          d.setMonth(d.getMonth() + i);
+          return {
+            user_id: user!.id,
+            venda_id: venda.id,
+            numero_parcela: i + 1,
+            valor_parcela: valorParcela,
+            data_vencimento: d.toISOString().slice(0, 10),
+            status_parcela: "pendente",
+          };
+        });
+        await supabase.from("parcelas_venda").insert(rows);
+      }
 
       // Atualizar estoque
       for (const it of itens) {
@@ -225,26 +259,28 @@ function NovaVenda() {
         <CardHeader><CardTitle className="text-base">Pagamento</CardTitle></CardHeader>
         <CardContent className="grid sm:grid-cols-3 gap-3">
           <div>
+            <Label>Tipo</Label>
+            <Select value={tipoVenda} onValueChange={(v: any) => setTipoVenda(v)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="a_vista">À vista</SelectItem>
+                <SelectItem value="a_prazo">A prazo</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
             <Label>Forma</Label>
             <Select value={forma} onValueChange={setForma}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="pix">Pix</SelectItem>
                 <SelectItem value="dinheiro">Dinheiro</SelectItem>
-                <SelectItem value="cartao">Cartão</SelectItem>
+                <SelectItem value="cartao_credito">Cartão crédito</SelectItem>
+                <SelectItem value="cartao_debito">Cartão débito</SelectItem>
                 <SelectItem value="boleto">Boleto</SelectItem>
                 <SelectItem value="fiado">Fiado</SelectItem>
+                <SelectItem value="transferencia">Transferência</SelectItem>
                 <SelectItem value="outro">Outro</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>Status</Label>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pago">Pago</SelectItem>
-                <SelectItem value="pendente">Pendente</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -252,6 +288,24 @@ function NovaVenda() {
             <Label>Desconto (R$)</Label>
             <Input type="number" step="0.01" value={desconto} onChange={(e) => setDesconto(e.target.value)} />
           </div>
+
+          {tipoVenda === "a_prazo" && (
+            <div className="sm:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 rounded bg-amber-500/5 border border-amber-500/20">
+              <div>
+                <Label>Parcelas</Label>
+                <Input type="number" min={1} max={36} value={parcelas} onChange={(e) => setParcelas(e.target.value)} />
+              </div>
+              <div>
+                <Label>1º vencimento</Label>
+                <Input type="date" value={vencimento} onChange={(e) => setVencimento(e.target.value)} />
+              </div>
+              <div>
+                <Label>Valor pago agora (R$)</Label>
+                <Input type="number" step="0.01" value={valorPagoPrazo} onChange={(e) => setValorPagoPrazo(e.target.value)} />
+              </div>
+            </div>
+          )}
+
           <div className="sm:col-span-3">
             <Label>Observações</Label>
             <Textarea rows={2} value={obs} onChange={(e) => setObs(e.target.value)} />

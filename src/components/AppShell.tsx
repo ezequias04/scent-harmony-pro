@@ -1,5 +1,5 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, SprayCan, ShoppingCart, Users, BookOpen, LogOut, Sparkles, Menu, Plus, ClipboardList } from "lucide-react";
+import { LayoutDashboard, SprayCan, ShoppingCart, Users, BookOpen, LogOut, Sparkles, Menu, Plus, ClipboardList, BarChart3 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -13,11 +13,12 @@ const nav = [
   { to: "/vendas", label: "Vendas", icon: ShoppingCart },
   { to: "/pedidos", label: "Pedidos", icon: ClipboardList },
   { to: "/clientes", label: "Clientes", icon: Users },
+  { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
   { to: "/catalogo", label: "Catálogo", icon: BookOpen },
 ] as const;
 
 // Bottom nav mobile: 5 itens principais
-const bottomNav = [nav[0], nav[1], nav[2], nav[3], nav[5]] as const;
+const bottomNav = [nav[0], nav[2], nav[3], nav[5], nav[6]] as const;
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
