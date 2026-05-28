@@ -48,100 +48,121 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-serif: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
+/* ============================================================
+   Golden Essence — Luxury Perfumes & Timeless Beauty
+   Paleta: dourado árabe + verde inglês + creme + bordô + âmbar
+   ============================================================ */
 :root {
   --radius: 0.75rem;
 
-  /* Bege claro */
-  --background: oklch(0.975 0.008 75);
-  --foreground: oklch(0.22 0.02 30);
+  /* Creme perolado #F5EFE2 */
+  --background: oklch(0.955 0.018 85);
+  /* Preto profundo #0D0D0D */
+  --foreground: oklch(0.16 0.005 60);
 
-  --card: oklch(0.995 0.004 80);
-  --card-foreground: oklch(0.22 0.02 30);
-  --popover: oklch(0.995 0.004 80);
-  --popover-foreground: oklch(0.22 0.02 30);
+  --card: oklch(0.985 0.012 85);
+  --card-foreground: oklch(0.16 0.005 60);
+  --popover: oklch(0.985 0.012 85);
+  --popover-foreground: oklch(0.16 0.005 60);
 
-  /* Vinho escuro */
-  --primary: oklch(0.39 0.12 22);
-  --primary-foreground: oklch(0.98 0.01 80);
+  /* Dourado elegante #C9A24D — botões dourados com texto escuro */
+  --primary: oklch(0.74 0.13 82);
+  --primary-foreground: oklch(0.16 0.005 60);
 
-  /* Bege médio */
-  --secondary: oklch(0.93 0.018 78);
-  --secondary-foreground: oklch(0.28 0.05 25);
+  /* Creme médio com calor */
+  --secondary: oklch(0.92 0.025 80);
+  --secondary-foreground: oklch(0.22 0.03 45);
 
-  --muted: oklch(0.94 0.012 78);
-  --muted-foreground: oklch(0.48 0.02 40);
+  --muted: oklch(0.93 0.018 82);
+  --muted-foreground: oklch(0.46 0.025 55);
 
-  /* Dourado suave (acento) */
-  --accent: oklch(0.78 0.10 80);
-  --accent-foreground: oklch(0.25 0.04 30);
+  /* Verde inglês escuro #12372A — usado como acento institucional */
+  --accent: oklch(0.34 0.055 155);
+  --accent-foreground: oklch(0.96 0.018 85);
 
-  --destructive: oklch(0.55 0.22 27);
-  --destructive-foreground: oklch(0.98 0.01 80);
+  /* Bordô sofisticado #5A1E2D */
+  --destructive: oklch(0.36 0.10 18);
+  --destructive-foreground: oklch(0.96 0.018 85);
 
-  --success: oklch(0.58 0.13 150);
-  --success-foreground: oklch(0.98 0.01 80);
+  --success: oklch(0.42 0.07 155);
+  --success-foreground: oklch(0.96 0.018 85);
 
-  --warning: oklch(0.78 0.14 75);
-  --warning-foreground: oklch(0.25 0.04 30);
+  --warning: oklch(0.74 0.13 82);
+  --warning-foreground: oklch(0.16 0.005 60);
 
-  --border: oklch(0.88 0.013 75);
-  --input: oklch(0.91 0.012 75);
-  --ring: oklch(0.39 0.12 22);
+  --border: oklch(0.86 0.022 80);
+  --input: oklch(0.90 0.018 80);
+  /* Foco dourado */
+  --ring: oklch(0.74 0.13 82);
 
-  --chart-1: oklch(0.39 0.12 22);
-  --chart-2: oklch(0.65 0.12 75);
-  --chart-3: oklch(0.55 0.05 40);
-  --chart-4: oklch(0.78 0.10 80);
-  --chart-5: oklch(0.45 0.08 25);
+  --chart-1: oklch(0.74 0.13 82);   /* dourado */
+  --chart-2: oklch(0.34 0.055 155); /* verde inglês */
+  --chart-3: oklch(0.36 0.10 18);   /* bordô */
+  --chart-4: oklch(0.45 0.08 55);   /* âmbar marrom */
+  --chart-5: oklch(0.16 0.005 60);  /* preto */
 
-  --sidebar: oklch(0.99 0.005 80);
-  --sidebar-foreground: oklch(0.22 0.02 30);
-  --sidebar-primary: oklch(0.39 0.12 22);
-  --sidebar-primary-foreground: oklch(0.98 0.01 80);
-  --sidebar-accent: oklch(0.94 0.018 78);
-  --sidebar-accent-foreground: oklch(0.28 0.05 25);
-  --sidebar-border: oklch(0.88 0.013 75);
-  --sidebar-ring: oklch(0.39 0.12 22);
+  /* Sidebar: preto profundo com texto creme e detalhes dourados */
+  --sidebar: oklch(0.18 0.008 60);
+  --sidebar-foreground: oklch(0.92 0.02 85);
+  --sidebar-primary: oklch(0.74 0.13 82);
+  --sidebar-primary-foreground: oklch(0.16 0.005 60);
+  --sidebar-accent: oklch(0.24 0.01 60);
+  --sidebar-accent-foreground: oklch(0.96 0.018 85);
+  --sidebar-border: oklch(0.28 0.012 60);
+  --sidebar-ring: oklch(0.74 0.13 82);
 
-  --shadow-elegant: 0 8px 30px -12px oklch(0.39 0.12 22 / 0.18);
-  --gradient-primary: linear-gradient(135deg, oklch(0.39 0.12 22), oklch(0.30 0.10 22));
+  /* Tokens de marca extra */
+  --brand-gold: oklch(0.74 0.13 82);
+  --brand-gold-soft: oklch(0.82 0.10 82);
+  --brand-black: oklch(0.16 0.005 60);
+  --brand-cream: oklch(0.955 0.018 85);
+  --brand-amber: oklch(0.45 0.08 55);
+  --brand-green: oklch(0.34 0.055 155);
+  --brand-burgundy: oklch(0.36 0.10 18);
+
+  --shadow-elegant: 0 10px 40px -16px oklch(0.16 0.005 60 / 0.22), 0 2px 6px -2px oklch(0.16 0.005 60 / 0.08);
+  --shadow-gold: 0 8px 28px -12px oklch(0.74 0.13 82 / 0.45);
+  --gradient-gold: linear-gradient(135deg, oklch(0.82 0.10 82), oklch(0.66 0.14 80));
+  --gradient-noir: linear-gradient(135deg, oklch(0.20 0.008 60), oklch(0.14 0.005 60));
+  --gradient-emerald: linear-gradient(135deg, oklch(0.34 0.055 155), oklch(0.22 0.04 155));
 }
 
 .dark {
-  --background: oklch(0.18 0.015 30);
-  --foreground: oklch(0.96 0.01 80);
-  --card: oklch(0.22 0.02 30);
-  --card-foreground: oklch(0.96 0.01 80);
-  --popover: oklch(0.22 0.02 30);
-  --popover-foreground: oklch(0.96 0.01 80);
-  --primary: oklch(0.55 0.14 22);
-  --primary-foreground: oklch(0.98 0.01 80);
-  --secondary: oklch(0.28 0.03 30);
-  --secondary-foreground: oklch(0.96 0.01 80);
-  --muted: oklch(0.27 0.025 30);
-  --muted-foreground: oklch(0.72 0.02 60);
-  --accent: oklch(0.65 0.12 80);
-  --accent-foreground: oklch(0.20 0.02 30);
-  --destructive: oklch(0.65 0.22 27);
-  --destructive-foreground: oklch(0.98 0.01 80);
-  --success: oklch(0.65 0.13 150);
-  --success-foreground: oklch(0.15 0.01 30);
-  --warning: oklch(0.78 0.14 75);
-  --warning-foreground: oklch(0.20 0.02 30);
+  --background: oklch(0.14 0.005 60);
+  --foreground: oklch(0.95 0.02 85);
+  --card: oklch(0.20 0.008 60);
+  --card-foreground: oklch(0.95 0.02 85);
+  --popover: oklch(0.20 0.008 60);
+  --popover-foreground: oklch(0.95 0.02 85);
+  --primary: oklch(0.78 0.13 82);
+  --primary-foreground: oklch(0.14 0.005 60);
+  --secondary: oklch(0.26 0.012 60);
+  --secondary-foreground: oklch(0.95 0.02 85);
+  --muted: oklch(0.24 0.01 60);
+  --muted-foreground: oklch(0.72 0.025 75);
+  --accent: oklch(0.42 0.07 155);
+  --accent-foreground: oklch(0.96 0.018 85);
+  --destructive: oklch(0.50 0.13 18);
+  --destructive-foreground: oklch(0.96 0.018 85);
+  --success: oklch(0.55 0.10 155);
+  --success-foreground: oklch(0.14 0.005 60);
+  --warning: oklch(0.78 0.13 82);
+  --warning-foreground: oklch(0.14 0.005 60);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.55 0.14 22);
-  --sidebar: oklch(0.20 0.02 30);
-  --sidebar-foreground: oklch(0.96 0.01 80);
-  --sidebar-primary: oklch(0.55 0.14 22);
-  --sidebar-primary-foreground: oklch(0.98 0.01 80);
-  --sidebar-accent: oklch(0.27 0.025 30);
-  --sidebar-accent-foreground: oklch(0.96 0.01 80);
+  --ring: oklch(0.78 0.13 82);
+  --sidebar: oklch(0.12 0.005 60);
+  --sidebar-foreground: oklch(0.92 0.02 85);
+  --sidebar-primary: oklch(0.78 0.13 82);
+  --sidebar-primary-foreground: oklch(0.14 0.005 60);
+  --sidebar-accent: oklch(0.22 0.01 60);
+  --sidebar-accent-foreground: oklch(0.95 0.02 85);
   --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: oklch(0.55 0.14 22);
+  --sidebar-ring: oklch(0.78 0.13 82);
 }
 
 @layer base {
@@ -151,10 +172,25 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
   }
-  h1, h2, h3, .font-serif {
+  h1, h2, h3, h4, .font-serif {
     font-family: var(--font-serif);
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
+    font-weight: 600;
   }
+}
+
+/* Utilitários de marca */
+.text-gold { color: var(--brand-gold); }
+.bg-gold { background-color: var(--brand-gold); }
+.gradient-gold { background-image: var(--gradient-gold); }
+.gradient-noir { background-image: var(--gradient-noir); }
+.gradient-emerald { background-image: var(--gradient-emerald); }
+.shadow-elegant { box-shadow: var(--shadow-elegant); }
+.shadow-gold { box-shadow: var(--shadow-gold); }
+.divider-gold {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--brand-gold), transparent);
 }
