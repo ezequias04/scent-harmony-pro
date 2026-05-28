@@ -50,13 +50,13 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 
 function Brand() {
   return (
-    <div className="flex items-center gap-2 px-4 py-5 border-b border-sidebar-border">
-      <div className="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
+    <div className="flex items-center gap-3 px-4 py-5 border-b border-sidebar-border">
+      <div className="w-10 h-10 rounded-lg gradient-gold text-[oklch(0.16_0.005_60)] flex items-center justify-center shadow-gold">
         <Sparkles className="w-5 h-5" />
       </div>
-      <div>
-        <div className="font-serif text-lg leading-tight">Gestor</div>
-        <div className="text-xs text-muted-foreground -mt-0.5">de Perfumes</div>
+      <div className="leading-tight">
+        <div className="font-serif text-lg tracking-wide text-sidebar-foreground">Golden Essence</div>
+        <div className="text-[10px] uppercase tracking-[0.18em] text-sidebar-foreground/60 mt-0.5">Luxury Perfumes</div>
       </div>
     </div>
   );
@@ -145,10 +145,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         {/* Mobile header */}
         <header className="md:hidden flex items-center justify-between px-4 h-14 border-b border-border bg-card sticky top-0 z-30">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg gradient-gold text-[oklch(0.16_0.005_60)] flex items-center justify-center shadow-gold">
               <Sparkles className="w-4 h-4" />
             </div>
-            <span className="font-serif text-lg">Gestor</span>
+            <span className="font-serif text-lg tracking-wide">Golden Essence</span>
           </div>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
