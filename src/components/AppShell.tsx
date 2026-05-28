@@ -145,10 +145,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         {/* Mobile header */}
         <header className="md:hidden flex items-center justify-between px-4 h-14 border-b border-border bg-card sticky top-0 z-30">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg gradient-gold text-[oklch(0.16_0.005_60)] flex items-center justify-center shadow-gold">
               <Sparkles className="w-4 h-4" />
             </div>
-            <span className="font-serif text-lg">Gestor</span>
+            <span className="font-serif text-lg tracking-wide">Golden Essence</span>
           </div>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
