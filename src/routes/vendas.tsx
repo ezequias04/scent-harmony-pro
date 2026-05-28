@@ -122,7 +122,7 @@ function VendasPage() {
         <Card><CardContent className="py-16 text-center">
           <ShoppingCart className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
           <p className="text-muted-foreground mb-4">Nenhuma venda ainda.</p>
-          <Link to="/vendas/nova"><Button>Registrar primeira venda</Button></Link>
+          <Button asChild><Link to="/vendas/nova">Registrar primeira venda</Link></Button>
         </CardContent></Card>
       ) : (
         <div className="space-y-2">
