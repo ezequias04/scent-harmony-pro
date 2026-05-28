@@ -1,13 +1,13 @@
 {
-  "name": "Gestor de Perfumes",
-  "short_name": "Gestor",
-  "description": "Controle de vendas, estoque, clientes e catálogo para revenda de perfumes e produtos de beleza.",
+  "name": "Golden Essence — Luxury Perfumes",
+  "short_name": "Golden Essence",
+  "description": "Golden Essence — Luxury Perfumes & Timeless Beauty. Perfumaria de luxo com inspiração árabe e elegância inglesa.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f7f1e8",
-  "theme_color": "#7a1f2b",
+  "background_color": "#F5EFE2",
+  "theme_color": "#C9A24D",
   "lang": "pt-BR",
   "icons": [
     {
