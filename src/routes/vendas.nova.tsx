@@ -80,11 +80,12 @@ function NovaVenda() {
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (itens.length === 0) return toast.error("Adicione ao menos um perfume");
+    if (itens.length === 0) return toast.error("Adicione ao menos um produto");
     for (const it of itens) {
-      if (!it.perfume_id) return toast.error("Selecione todos os perfumes");
+      if (!it.perfume_id) return toast.error("Selecione todos os produtos");
       const p = perfumes.find((x) => x.id === it.perfume_id)!;
-      if (it.quantidade > p.quantidade_estoque) return toast.error(`Estoque insuficiente para ${p.nome}`);
+      if (p.quantidade_estoque <= 0) return toast.error(`${p.nome} está sem estoque. Reponha antes de vender.`);
+      if (it.quantidade > p.quantidade_estoque) return toast.error(`Estoque insuficiente para ${p.nome} (disponível: ${p.quantidade_estoque})`);
     }
     setSaving(true);
     try {
