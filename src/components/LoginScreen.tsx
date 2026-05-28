@@ -39,18 +39,23 @@ export function LoginScreen() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-background">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-background relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none opacity-[0.06]" style={{
+        backgroundImage: "radial-gradient(circle at 20% 20%, var(--brand-gold) 0, transparent 40%), radial-gradient(circle at 80% 80%, var(--brand-green) 0, transparent 45%)",
+      }} />
+      <div className="w-full max-w-md relative">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary text-primary-foreground mb-4 shadow-[var(--shadow-elegant)]">
-            <Sparkles className="w-7 h-7" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-gold text-[oklch(0.16_0.005_60)] mb-5 shadow-gold">
+            <Sparkles className="w-8 h-8" />
           </div>
-          <h1 className="font-serif text-4xl text-foreground">Gestor de Perfumes</h1>
-          <p className="text-muted-foreground mt-2">Controle elegante para sua revenda</p>
+          <div className="text-[10px] tracking-[0.32em] uppercase text-muted-foreground mb-2">Maison de Parfum</div>
+          <h1 className="font-serif text-4xl text-foreground">Golden Essence</h1>
+          <div className="mx-auto mt-3 w-24 divider-gold" />
+          <p className="text-muted-foreground mt-3 italic">Luxury Perfumes &amp; Timeless Beauty</p>
         </div>
-        <Card>
+        <Card className="shadow-elegant border-border/60">
           <CardHeader>
-            <CardTitle>Entrar</CardTitle>
+            <CardTitle className="font-serif">Bem-vindo</CardTitle>
             <CardDescription>Acesse sua conta ou crie uma nova</CardDescription>
           </CardHeader>
           <CardContent>
