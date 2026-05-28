@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -15,8 +15,13 @@ export const Route = createFileRoute("/vendas")({
 });
 
 function VendasPage() {
+  const location = useLocation();
   const qc = useQueryClient();
   const { user } = useAuth();
+
+  if (location.pathname !== "/vendas") {
+    return <Outlet />;
+  }
 
   const { data: vendas = [], isLoading } = useQuery({
     queryKey: ["vendas"],
