@@ -83,7 +83,7 @@ export function LoginScreen() {
                 <form onSubmit={handleSignup} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Nome da loja</Label>
-                    <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Perfumes da Ana" />
+                    <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Maison Aurora" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email2">E-mail</Label>
