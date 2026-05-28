@@ -111,9 +111,9 @@ function VendasPage() {
           <h1 className="text-3xl">Vendas</h1>
           <p className="text-muted-foreground text-sm">{vendas.length} registradas</p>
         </div>
-        <Link to="/vendas/nova">
-          <Button><Plus className="w-4 h-4 mr-2" /> Nova venda</Button>
-        </Link>
+        <Button asChild>
+          <Link to="/vendas/nova"><Plus className="w-4 h-4 mr-2" /> Nova venda</Link>
+        </Button>
       </div>
 
       {isLoading ? (
