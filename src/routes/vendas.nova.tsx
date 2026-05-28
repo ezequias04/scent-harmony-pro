@@ -31,7 +31,6 @@ function NovaVenda() {
       const { data, error } = await supabase
         .from("perfumes")
         .select("id, nome, marca, tipo_produto, tamanho_volume, volume_ml, imagem_url, preco_venda, preco_custo, quantidade_estoque")
-        .gt("quantidade_estoque", 0)
         .order("nome");
       if (error) throw error;
       return data as Perfume[];
