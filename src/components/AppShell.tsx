@@ -50,13 +50,13 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 
 function Brand() {
   return (
-    <div className="flex items-center gap-2 px-4 py-5 border-b border-sidebar-border">
-      <div className="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
+    <div className="flex items-center gap-3 px-4 py-5 border-b border-sidebar-border">
+      <div className="w-10 h-10 rounded-lg gradient-gold text-[oklch(0.16_0.005_60)] flex items-center justify-center shadow-gold">
         <Sparkles className="w-5 h-5" />
       </div>
-      <div>
-        <div className="font-serif text-lg leading-tight">Gestor</div>
-        <div className="text-xs text-muted-foreground -mt-0.5">de Perfumes</div>
+      <div className="leading-tight">
+        <div className="font-serif text-lg tracking-wide text-sidebar-foreground">Golden Essence</div>
+        <div className="text-[10px] uppercase tracking-[0.18em] text-sidebar-foreground/60 mt-0.5">Luxury Perfumes</div>
       </div>
     </div>
   );
