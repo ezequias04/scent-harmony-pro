@@ -137,11 +137,12 @@ export const convertPedidoToVenda = createServerFn({ method: "POST" })
     const { error: eIV } = await supabase.from("itens_venda").insert(itensRows);
     if (eIV) throw new Error(eIV.message);
 
-    // Parcelas
-    if (isPrazo && data.quantidade_parcelas > 1) {
-      const valorPorParcela = Number((total / data.quantidade_parcelas).toFixed(2));
+    // Parcelas (sempre quando for a prazo, inclusive 1 parcela)
+    if (isPrazo) {
+      const nParc = data.quantidade_parcelas;
+      const valorPorParcela = Number((total / nParc).toFixed(2));
       const baseDate = data.data_vencimento ? new Date(data.data_vencimento) : new Date();
-      const parcelas = Array.from({ length: data.quantidade_parcelas }, (_, i) => {
+      const parcelas = Array.from({ length: nParc }, (_, i) => {
         const d = new Date(baseDate);
         d.setMonth(d.getMonth() + i);
         return {
@@ -153,7 +154,8 @@ export const convertPedidoToVenda = createServerFn({ method: "POST" })
           status_parcela: "pendente",
         };
       });
-      await supabase.from("parcelas_venda").insert(parcelas);
+      const { error: ePz } = await supabase.from("parcelas_venda").insert(parcelas);
+      if (ePz) throw new Error(ePz.message);
     }
 
     // Baixar estoque + movimentações

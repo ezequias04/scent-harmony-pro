@@ -134,8 +134,8 @@ function NovaVenda() {
       const { error: ei } = await supabase.from("itens_venda").insert(itensRows);
       if (ei) throw ei;
 
-      // Parcelas
-      if (isPrazo && nParc > 1) {
+      // Parcelas (sempre quando for a prazo, inclusive 1 parcela)
+      if (isPrazo) {
         const valorParcela = Number((total / nParc).toFixed(2));
         const base = vencimento ? new Date(vencimento + "T00:00:00") : new Date();
         const rows = Array.from({ length: nParc }, (_, i) => {
@@ -150,21 +150,24 @@ function NovaVenda() {
             status_parcela: "pendente",
           };
         });
-        await supabase.from("parcelas_venda").insert(rows);
+        const { error: epz } = await supabase.from("parcelas_venda").insert(rows);
+        if (epz) throw epz;
       }
 
       // Atualizar estoque
       for (const it of itens) {
         const p = perfumes.find((x) => x.id === it.perfume_id)!;
         const newQtd = p.quantidade_estoque - it.quantidade;
-        await supabase.from("perfumes").update({ quantidade_estoque: newQtd }).eq("id", p.id);
-        await supabase.from("movimentacoes_estoque").insert({
+        const { error: eUp } = await supabase.from("perfumes").update({ quantidade_estoque: newQtd }).eq("id", p.id);
+        if (eUp) throw eUp;
+        const { error: eMv } = await supabase.from("movimentacoes_estoque").insert({
           user_id: user!.id,
           perfume_id: p.id,
           tipo: "saida_venda",
           quantidade: it.quantidade,
           motivo: `Venda ${venda.id.slice(0, 8)}`,
         });
+        if (eMv) throw eMv;
       }
 
       toast.success("Venda registrada!");

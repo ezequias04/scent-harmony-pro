@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import {
   Outlet,
   createRootRouteWithContext,
@@ -6,9 +6,11 @@ import {
   Scripts,
   useRouterState,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
+import { supabase } from "@/integrations/supabase/client";
 import { LoginScreen } from "@/components/LoginScreen";
 import { AppShell } from "@/components/AppShell";
 import { Toaster } from "@/components/ui/sonner";
@@ -62,8 +64,19 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function Gate() {
   const { loading, session } = useAuth();
+  const qc = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isPublic = PUBLIC_PREFIXES.some((p) => pathname.startsWith(p));
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
+        qc.invalidateQueries();
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [qc]);
+
   if (isPublic) return <Outlet />;
   if (loading) {
     return (
