@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -11,8 +11,18 @@ import { Plus, ShoppingCart, Receipt, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/vendas")({
-  component: VendasPage,
+  component: VendasRouteComponent,
 });
+
+function VendasRouteComponent() {
+  const location = useLocation();
+
+  if (location.pathname !== "/vendas") {
+    return <Outlet />;
+  }
+
+  return <VendasPage />;
+}
 
 function VendasPage() {
   const qc = useQueryClient();
