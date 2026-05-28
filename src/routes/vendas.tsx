@@ -32,25 +32,43 @@ function VendasPage() {
   });
 
   const pagarMut = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("vendas").update({ status_pagamento: "pago" }).eq("id", id);
+    mutationFn: async (venda: any) => {
+      const total = Number(venda.total ?? 0);
+      const today = new Date().toISOString().slice(0, 10);
+      const { error } = await supabase
+        .from("vendas")
+        .update({ status_pagamento: "pago", valor_pago: total, valor_pendente: 0 })
+        .eq("id", venda.id);
       if (error) throw error;
+      await supabase
+        .from("parcelas_venda")
+        .update({ status_parcela: "pago", data_pagamento: today })
+        .eq("venda_id", venda.id)
+        .eq("status_parcela", "pendente");
     },
-    onSuccess: () => { toast.success("Pagamento confirmado"); qc.invalidateQueries({ queryKey: ["vendas"] }); },
+    onSuccess: () => {
+      toast.success("Pagamento confirmado");
+      qc.invalidateQueries({ queryKey: ["vendas"] });
+      qc.invalidateQueries({ queryKey: ["rel-vendas"] });
+      qc.invalidateQueries({ queryKey: ["rel-parcelas"] });
+    },
+    onError: (e: any) => toast.error(e.message),
   });
 
   const cancelMut = useMutation({
     mutationFn: async (venda: any) => {
       if (venda.status_pagamento === "cancelado") throw new Error("Venda já cancelada");
+      let pulados = 0;
       // Devolve estoque
       for (const it of venda.itens_venda ?? []) {
         const { data: p, error: ep } = await supabase
           .from("perfumes")
           .select("quantidade_estoque")
           .eq("id", it.perfume_id)
-          .single();
+          .maybeSingle();
         if (ep) throw ep;
-        const novaQtd = (p?.quantidade_estoque ?? 0) + it.quantidade;
+        if (!p) { pulados++; continue; }
+        const novaQtd = (p.quantidade_estoque ?? 0) + it.quantidade;
         const { error: eu } = await supabase
           .from("perfumes")
           .update({ quantidade_estoque: novaQtd })
@@ -70,15 +88,16 @@ function VendasPage() {
         .update({ status_pagamento: "cancelado" })
         .eq("id", venda.id);
       if (error) throw error;
-      // Cancela parcelas pendentes
       await supabase
         .from("parcelas_venda")
         .update({ status_parcela: "cancelado" })
         .eq("venda_id", venda.id)
         .eq("status_parcela", "pendente");
+      return { pulados };
     },
-    onSuccess: () => {
-      toast.success("Venda cancelada e estoque devolvido");
+    onSuccess: (res) => {
+      if (res?.pulados) toast.warning(`Venda cancelada (${res.pulados} produto(s) já excluído(s) — não devolvidos)`);
+      else toast.success("Venda cancelada e estoque devolvido");
       qc.invalidateQueries({ queryKey: ["vendas"] });
       qc.invalidateQueries({ queryKey: ["perfumes"] });
     },
@@ -128,7 +147,7 @@ function VendasPage() {
                     <div className="text-xs text-muted-foreground">Lucro {fmtBRL(v.lucro_total)}</div>
                     <div className="flex gap-1">
                       {v.status_pagamento === "pendente" && (
-                        <Button size="sm" variant="outline" className="h-7" onClick={() => pagarMut.mutate(v.id)}>
+                        <Button size="sm" variant="outline" className="h-7" onClick={() => pagarMut.mutate(v)}>
                           Marcar pago
                         </Button>
                       )}

@@ -34,7 +34,9 @@ function Dashboard() {
         supabase.from("vendas").select("id,total,cliente_id,data_venda").eq("status_pagamento", "pendente"),
       ]);
 
-      const vendas = vendasRes.data ?? [];
+      const vendasAll = vendasRes.data ?? [];
+      // Ignora vendas canceladas em todos os totais e no gráfico
+      const vendas = vendasAll.filter(v => v.status_pagamento !== "cancelado");
       const perfumes = perfumesRes.data ?? [];
       const pendentes = pendentesRes.data ?? [];
 
